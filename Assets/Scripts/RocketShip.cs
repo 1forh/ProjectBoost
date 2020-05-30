@@ -13,6 +13,9 @@ public class RocketShip : MonoBehaviour
     [SerializeField] AudioClip _mainEngineAudioClip;
     [SerializeField] AudioClip _successAudioClip;
     [SerializeField] AudioClip _deathAudioClip;
+    [SerializeField] ParticleSystem _mainEngineParticleSystem;
+    [SerializeField] ParticleSystem _successParticleSystem;
+    [SerializeField] ParticleSystem _deathParticleSystem;
 
     enum State { Alive, Dying, Transcending };
     [SerializeField] State state = State.Alive;
@@ -42,18 +45,32 @@ public class RocketShip : MonoBehaviour
             case "Friendly":
                 break;
             case "Finish":
-                state = State.Transcending;
-                _audioSource.PlayOneShot(_successAudioClip);
-                Invoke("LoadNextLevel", 2.3f); // serialize
+                StartSuccessSequence();
                 break;
             case "Obstacle":
-                state = State.Dying;
-                _audioSource.PlayOneShot(_deathAudioClip);
-                Invoke("LoadFirstLevel", 3.0f); // serialize
+                StartDeathSequence();
                 break;
             default:
                 break;
         }
+    }
+
+    private void StartDeathSequence()
+    {
+        state = State.Dying;
+        _audioSource.Stop();
+        _audioSource.PlayOneShot(_deathAudioClip);
+        _deathParticleSystem.Play();
+        Invoke("LoadFirstLevel", 3.0f); // serialize
+    }
+
+    private void StartSuccessSequence()
+    {
+        state = State.Transcending;
+        _audioSource.Stop();
+        _audioSource.PlayOneShot(_successAudioClip);
+        _successParticleSystem.Play();
+        Invoke("LoadNextLevel", 2.3f); // serialize
     }
 
     private void LoadFirstLevel()
@@ -99,11 +116,13 @@ public class RocketShip : MonoBehaviour
             if (!_audioSource.isPlaying)
             {
                 _audioSource.PlayOneShot(_mainEngineAudioClip);
+                _mainEngineParticleSystem.Play();
             }
         }
         else
         {
             _audioSource.Stop();
+            _mainEngineParticleSystem.Stop();
         }
     }
 }
