@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class RocketShip : MonoBehaviour
 {
@@ -29,7 +30,11 @@ public class RocketShip : MonoBehaviour
         {
             case "Friendly":
                 break;
-            case "Fuel":
+            case "Finish":
+                SceneManager.LoadScene(1);
+                break;
+            case "Obstacle":
+                SceneManager.LoadScene(0);
                 break;
             default:
                 break;
