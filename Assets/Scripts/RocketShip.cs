@@ -7,6 +7,8 @@ public class RocketShip : MonoBehaviour
 {
     Rigidbody _rigidbody;
     AudioSource _audioSource;
+    [SerializeField] float _mainThrust = 700.0f;
+    [SerializeField] float _rcsThrust = 100.0f;
 
     // Start is called before the first frame update
     void Start()
@@ -21,6 +23,19 @@ public class RocketShip : MonoBehaviour
         ProcessInput();
     }
 
+    private void OnCollisionEnter(Collision other)
+    {
+        switch (other.gameObject.tag)
+        {
+            case "Friendly":
+                break;
+            case "Fuel":
+                break;
+            default:
+                break;
+        }
+    }
+
     private void ProcessInput()
     {
         Rotate();
@@ -31,13 +46,15 @@ public class RocketShip : MonoBehaviour
     {
         _rigidbody.freezeRotation = true;
 
+        float _rotationThisFrame = Time.deltaTime * _rcsThrust;
+
         if (Input.GetKey(KeyCode.A))
         {
-            transform.Rotate(Vector3.forward);
+            transform.Rotate(Vector3.forward * _rotationThisFrame);
         }
         else if (Input.GetKey(KeyCode.D))
         {
-            transform.Rotate(Vector3.back);
+            transform.Rotate(Vector3.back * _rotationThisFrame);
         }
 
         _rigidbody.freezeRotation = false;
@@ -47,7 +64,7 @@ public class RocketShip : MonoBehaviour
     {
         if (Input.GetKey(KeyCode.Space))
         {
-            _rigidbody.AddRelativeForce(Vector3.up);
+            _rigidbody.AddRelativeForce(Vector3.up * _mainThrust * Time.deltaTime);
 
             if (!_audioSource.isPlaying)
             {
