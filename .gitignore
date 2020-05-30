@@ -1,7 +1,6 @@
 [Ll]ibrary/
 [Tt]emp/
 [Oo]bj/
-[Bb]uild/
 [Bb]uilds/
 [Ll]ogs/
 
@@ -46,3 +45,5 @@ sysinfo.txt
 
 # Crashlytics generated file
 crashlytics-build.properties
+
+.DS_Store
