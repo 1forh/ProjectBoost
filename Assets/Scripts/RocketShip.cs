@@ -10,6 +10,12 @@ public class RocketShip : MonoBehaviour
     AudioSource _audioSource;
     [SerializeField] float _mainThrust = 700.0f;
     [SerializeField] float _rcsThrust = 100.0f;
+    [SerializeField] AudioClip _mainEngineAudioClip;
+    [SerializeField] AudioClip _successAudioClip;
+    [SerializeField] AudioClip _deathAudioClip;
+
+    enum State { Alive, Dying, Transcending };
+    [SerializeField] State state = State.Alive;
 
     // Start is called before the first frame update
     void Start()
@@ -21,33 +27,52 @@ public class RocketShip : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        ProcessInput();
+        if (state == State.Alive)
+        {
+            ProcessInput();
+        }
     }
 
     private void OnCollisionEnter(Collision other)
     {
+        if (state != State.Alive) { return; }   
+
         switch (other.gameObject.tag)
         {
             case "Friendly":
                 break;
             case "Finish":
-                SceneManager.LoadScene(1);
+                state = State.Transcending;
+                _audioSource.PlayOneShot(_successAudioClip);
+                Invoke("LoadNextLevel", 2.3f); // serialize
                 break;
             case "Obstacle":
-                SceneManager.LoadScene(0);
+                state = State.Dying;
+                _audioSource.PlayOneShot(_deathAudioClip);
+                Invoke("LoadFirstLevel", 3.0f); // serialize
                 break;
             default:
                 break;
         }
     }
 
-    private void ProcessInput()
+    private void LoadFirstLevel()
     {
-        Rotate();
-        Thrust();
+        SceneManager.LoadScene(0);
     }
 
-    private void Rotate()
+    private void LoadNextLevel()
+    {
+        SceneManager.LoadScene(1);
+    }
+
+    private void ProcessInput()
+    {
+        RespondToRotateInput();
+        RespondToThrustInput();
+    }
+
+    private void RespondToRotateInput()
     {
         _rigidbody.freezeRotation = true;
 
@@ -65,7 +90,7 @@ public class RocketShip : MonoBehaviour
         _rigidbody.freezeRotation = false;
     }
 
-    private void Thrust()
+    private void RespondToThrustInput()
     {
         if (Input.GetKey(KeyCode.Space))
         {
@@ -73,7 +98,7 @@ public class RocketShip : MonoBehaviour
 
             if (!_audioSource.isPlaying)
             {
-                _audioSource.Play();
+                _audioSource.PlayOneShot(_mainEngineAudioClip);
             }
         }
         else
