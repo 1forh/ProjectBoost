@@ -23,18 +23,13 @@ public class RocketShip : MonoBehaviour
 
     private void ProcessInput()
     {
-        if (Input.GetKey(KeyCode.Space))
-        {
-            _rigidbody.AddRelativeForce(Vector3.up);
+        Rotate();
+        Thrust();
+    }
 
-            if (!_audioSource.isPlaying)
-            {
-                _audioSource.Play();
-            }
-        } else
-        {
-            _audioSource.Stop();
-        }
+    private void Rotate()
+    {
+        _rigidbody.freezeRotation = true;
 
         if (Input.GetKey(KeyCode.A))
         {
@@ -43,6 +38,25 @@ public class RocketShip : MonoBehaviour
         else if (Input.GetKey(KeyCode.D))
         {
             transform.Rotate(Vector3.back);
+        }
+
+        _rigidbody.freezeRotation = false;
+    }
+
+    private void Thrust()
+    {
+        if (Input.GetKey(KeyCode.Space))
+        {
+            _rigidbody.AddRelativeForce(Vector3.up);
+
+            if (!_audioSource.isPlaying)
+            {
+                _audioSource.Play();
+            }
+        }
+        else
+        {
+            _audioSource.Stop();
         }
     }
 }
